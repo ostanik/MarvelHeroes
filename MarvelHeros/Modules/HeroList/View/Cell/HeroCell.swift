@@ -20,18 +20,15 @@ class HeroCell: UITableViewCell, IdentifiableNib {
         activityIndicator.startAnimating()
     }
 
-    func bind(_ character: Character) {
-        heroName?.text = character.name
-        loadImage(character.thumbnail)
+    func bind(_ hero: Hero) {
+        heroName?.text = hero.name
+        loadImage(hero.thumbnail)
     }
 
     private func loadImage(_ thumbnail: Thumbnail?) {
         guard let thumbnail = thumbnail, let url = URL(string: thumbnail.downloadablePath(.landscape, .medium)) else { return }
-        ImageDataProvider.shared.downloadImage(url: url) { [weak self] (image, _) in
+        heroImage.downloadImage(url: url) { [weak self] (_, _) in
             self?.activityIndicator.stopAnimating()
-            if let image = image {
-                self?.heroImage.image = image
-            }
         }
     }
 

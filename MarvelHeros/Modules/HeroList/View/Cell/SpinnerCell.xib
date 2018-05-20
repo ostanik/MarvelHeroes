@@ -31,7 +31,7 @@
             <connections>
                 <outlet property="activityIndicator" destination="bJA-JM-Zes" id="X9m-cL-bry"/>
             </connections>
-            <point key="canvasLocation" x="449" y="153"/>
+            <point key="canvasLocation" x="26" y="140"/>
         </tableViewCell>
     </objects>
 </document>

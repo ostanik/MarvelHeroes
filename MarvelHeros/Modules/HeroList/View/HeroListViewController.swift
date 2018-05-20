@@ -14,7 +14,7 @@ class HeroListViewController: UIViewController, IdentifiableNib, HeroListView {
 
     private var isFetchingData: Bool = false
 
-    private var characters = [Character]() {
+    private var heros = [Hero]() {
         didSet {
             isFetchingData = false
             tableView.reloadData()
@@ -45,18 +45,20 @@ class HeroListViewController: UIViewController, IdentifiableNib, HeroListView {
 
     // MARK: HeroListView Protocol methods.
 
-    func updateCharactersList(_ characters: [Character]) {
-        self.characters = characters
+    func updateHerosList(_ heros: [Hero]) {
+        self.heros = heros
     }
 
     func showError(message: String) {
-
+        let alert = UIAlertController(title: "Sorry", message: "We have some errors on our server. \nPlease try again latter. \nError Message: \(message)", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        self.present(alert, animated: true)
     }
 
-    func fetchMoreCharacters() {
+    func fetchMoreHeros() {
         isFetchingData = true
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
-        presenter?.onFetchCharacters()
+        presenter?.onFetchHeros()
     }
 }
 
@@ -70,7 +72,7 @@ extension HeroListViewController: UITableViewDataSource, UITableViewDelegate {
         if section == 1 {
             return isFetchingData ? 1 : 0
         }
-        return characters.count
+        return heros.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -79,8 +81,12 @@ extension HeroListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = cell as? HeroCell, let character = characters[safe: indexPath.row] else { return }
-        cell.bind(character)
+        guard let cell = cell as? HeroCell, let hero = heros[safe: indexPath.row] else { return }
+        cell.bind(hero)
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        presenter?.onSelectedHero(at: indexPath)
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -88,7 +94,7 @@ extension HeroListViewController: UITableViewDataSource, UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
 
         if (offsetY > contentHeight - scrollView.frame.height * 4) && !isFetchingData {
-            fetchMoreCharacters()
+            fetchMoreHeros()
         }
     }
 }

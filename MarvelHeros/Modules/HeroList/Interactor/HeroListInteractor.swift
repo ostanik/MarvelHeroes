@@ -11,26 +11,21 @@ import Foundation
 class HeroListInteractor: HeroListUseCase {
 
     weak var output: HeroListInteractorOutput?
-    private var dataProvider: CharactersProvider!
+    private var dataProvider: HerosProvider!
 
-    init(dataProvider: CharactersProvider = CharacterDataProvider()) {
+    init(dataProvider: HerosProvider = HeroDataProvider()) {
         self.dataProvider = dataProvider
     }
 
     // MARK: Protocol methods
 
-    func fetchCharactersList(offset: Int) {
-        dataProvider.fetchCharacter(offset: offset, completionHandler: { [weak self] (response, error) in
-            guard error == nil else {
-                self?.output?.onFailureFetchCharacters(error!)
+    func fetchHerosList(offset: Int) {
+        dataProvider.fetchHero(offset: offset, completionHandler: { [weak self] (response, error) in
+            guard error == nil, let response = response else {
+                self?.output?.onFailureFetchHeros(error!)
                 return
             }
-            guard let response = response else {
-                let error = CharactersProviderError.nilResults(description: "No results found.")
-                self?.output?.onFailureFetchCharacters(error)
-                return
-            }
-            self?.output?.onSuccessFetchCharacters(response.results)
+            self?.output?.onSuccessFetchHeros(response.results)
         })
     }
 }

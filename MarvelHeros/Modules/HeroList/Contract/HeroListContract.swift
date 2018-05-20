@@ -11,7 +11,7 @@ import Foundation
 protocol HeroListView: class {
     var presenter: HeroListPresentation? {get set}
 
-    func updateCharactersList(_ characters: [Character])
+    func updateHerosList(_ heros: [Hero])
     func showError(message: String)
 }
 
@@ -20,18 +20,21 @@ protocol HeroListPresentation: class {
     var router: HeroListWireframe? {get set}
     var interactor: HeroListUseCase? {get set}
 
-    func onFetchCharacters()
+    func onFetchHeros()
+    func onSelectedHero(at: IndexPath)
 }
 
 protocol HeroListUseCase: class {
     var output: HeroListInteractorOutput? {get set}
 
-    func fetchCharactersList(offset: Int)
+    func fetchHerosList(offset: Int)
 }
 
 protocol HeroListInteractorOutput: class {
-    func onSuccessFetchCharacters(_ characters: [Character])
-    func onFailureFetchCharacters(_ error: Error)
+    func onSuccessFetchHeros(_ heros: [Hero])
+    func onFailureFetchHeros(_ error: Error)
 }
 
-protocol HeroListWireframe: class {}
+protocol HeroListWireframe: class {
+    func openDetailOf(_ hero: Hero)
+}

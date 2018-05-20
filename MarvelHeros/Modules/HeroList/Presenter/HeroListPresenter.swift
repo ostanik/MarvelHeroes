@@ -15,7 +15,7 @@ class HeroListPresenter {
     var router: HeroListWireframe?
     var interactor: HeroListUseCase?
 
-    private var characters = [Character]()
+    private var heros = [Hero]()
 
     init(view: HeroListView = HeroListViewController(), router: HeroListWireframe = HeroListRouter(), interactor: HeroListUseCase = HeroListInteractor()) {
         self.view = view
@@ -25,19 +25,24 @@ class HeroListPresenter {
 }
 
 extension HeroListPresenter: HeroListPresentation {
-    func onFetchCharacters() {
-        interactor?.fetchCharactersList(offset: characters.count)
+    func onFetchHeros() {
+        interactor?.fetchHerosList(offset: heros.count)
+    }
+
+    func onSelectedHero(at index: IndexPath) {
+        guard let char = heros[safe: index.row] else { return }
+        router?.openDetailOf(char)
     }
 }
 
 extension HeroListPresenter: HeroListInteractorOutput {
-    func onSuccessFetchCharacters(_ characters: [Character]) {
-        self.characters.append(contentsOf: characters)
-        view?.updateCharactersList(self.characters)
+    func onSuccessFetchHeros(_ heros: [Hero]) {
+        self.heros.append(contentsOf: heros)
+        view?.updateHerosList(self.heros)
     }
 
-    func onFailureFetchCharacters(_ error: Error) {
-        if let error = error as? CharactersProviderError {
+    func onFailureFetchHeros(_ error: Error) {
+        if let error = error as? RequestError {
             view?.showError(message: error.description)
         } else {
             view?.showError(message: error.localizedDescription)

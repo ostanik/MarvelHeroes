@@ -10,7 +10,7 @@ import XCTest
 @testable import MarvelHeros
 
 class BaseProviderTest: XCTestCase {
-    let sut = BaseProvider()
+    let sut = BaseDataProvider()
 
     override func setUp() {
         super.setUp()

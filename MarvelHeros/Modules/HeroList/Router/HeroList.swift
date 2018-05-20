@@ -33,4 +33,11 @@ class HeroListRouter: HeroListWireframe {
         return viewController
     }
 
+    // MARK: HeroListWireFrame methods.
+
+    func openDetailOf(_ hero: Hero) {
+        let viewController = HeroDetailRouter.setupModule(hero: hero)
+        view?.navigationController?.pushViewController(viewController, animated: true)
+    }
+
 }

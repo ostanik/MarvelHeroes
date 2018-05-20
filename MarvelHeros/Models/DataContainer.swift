@@ -19,3 +19,22 @@ struct DataContainer<T: Codable>: Codable {
     let count: Int
     let results: [T]
 }
+
+struct ListsContainer<T: Codable>: Codable {
+    let avaliable: Int?
+    let returned: Int?
+    let collectionURI: String?
+    let items: [T]
+}
+
+protocol Summary: Codable {
+    var resourceURI: String? {get set}
+    var name: String? {get set}
+}
+
+protocol Detailed: Codable {
+    var id: Int { get set }
+    var title: String? {get set}
+    var description: String? {get set}
+    var thumbnail: Thumbnail? {get set}
+}
