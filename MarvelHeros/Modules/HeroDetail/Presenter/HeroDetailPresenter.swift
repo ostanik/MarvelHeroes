@@ -23,6 +23,10 @@ class HeroDetailPresenter {
         return totalFetchMade
     }
 
+    var totalItensToFetch: Int {
+        return summaryCollection(hero: hero).map({ $0.count }).reduce(0, +)
+    }
+
     init(view: HeroDetailView = HeroDetailViewController(),
          router: HeroDetailWireframe = HeroDetailRouter(),
          interactor: HeroDetailUseCase = HeroDetailInteractor()) {
@@ -39,7 +43,6 @@ extension HeroDetailPresenter: HeroDetailPresentation {
     }
 
     func fetchDetails() {
-        let totalItensToFetch = summaryCollection(hero: hero).map({ $0.count }).reduce(0, +)
         if totalItensToFetch != 0 {
             summaryCollection(hero: hero).forEach {
                 $0.prefix(3).forEach(performFetch())

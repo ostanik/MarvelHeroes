@@ -10,5 +10,5 @@ import Foundation
 
 protocol HerosProvider {
     typealias CompletionHandler = (_ result: DataContainer<Hero>?, _ error: Error?) -> Void
-    func fetchHero(offset: Int, completionHandler: @escaping CompletionHandler)
+    func fetchHero(startName: String, offset: Int, completionHandler: @escaping CompletionHandler)
 }

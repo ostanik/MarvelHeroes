@@ -11,8 +11,10 @@ import Foundation
 protocol HeroListView: class {
     var presenter: HeroListPresentation? {get set}
 
-    func updateHerosList(_ heros: [Hero])
+    func updateHerosList(_ heros: [Hero], reachedEnd: Bool)
     func showError(message: String)
+    func showLoading()
+    func hideLoading()
 }
 
 protocol HeroListPresentation: class {
@@ -21,17 +23,19 @@ protocol HeroListPresentation: class {
     var interactor: HeroListUseCase? {get set}
 
     func onFetchHeros()
+    func onFetchHerosPagination()
     func onSelectedHero(at: IndexPath)
+    func onSearchForHero(_ name: String)
 }
 
 protocol HeroListUseCase: class {
     var output: HeroListInteractorOutput? {get set}
 
-    func fetchHerosList(offset: Int)
+    func fetchHerosList(name: String, offset: Int)
 }
 
 protocol HeroListInteractorOutput: class {
-    func onSuccessFetchHeros(_ heros: [Hero])
+    func onSuccessFetchHeros(_ dataContainer: DataContainer<Hero>)
     func onFailureFetchHeros(_ error: Error)
 }
 

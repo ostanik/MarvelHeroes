@@ -9,32 +9,43 @@
 import UIKit
 
 class HeroListViewController: UIViewController, IdentifiableNib, HeroListView {
+
+    // MARK: Properties
+
     @IBOutlet var tableView: UITableView!
     var presenter: HeroListPresentation?
-
-    private var isFetchingData: Bool = false
+    let searchController = UISearchController(searchResultsController: nil)
+    private var reachedEnd: Bool = true
 
     private var heros = [Hero]() {
         didSet {
-            isFetchingData = false
             tableView.reloadData()
         }
     }
+
+    private var canShowLoading: Bool = true {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+
+    // MARK: Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
         setupTable()
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        presenter?.onFetchHeros()
     }
 
     private func setupView() {
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
+        searchController.searchBar.placeholder = "Search for heros"
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
     }
 
     private func setupTable() {
@@ -45,8 +56,9 @@ class HeroListViewController: UIViewController, IdentifiableNib, HeroListView {
 
     // MARK: HeroListView Protocol methods.
 
-    func updateHerosList(_ heros: [Hero]) {
+    func updateHerosList(_ heros: [Hero], reachedEnd: Bool) {
         self.heros = heros
+        self.reachedEnd = reachedEnd
     }
 
     func showError(message: String) {
@@ -56,21 +68,36 @@ class HeroListViewController: UIViewController, IdentifiableNib, HeroListView {
     }
 
     func fetchMoreHeros() {
-        isFetchingData = true
-        tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
+        presenter?.onFetchHerosPagination()
+    }
+
+    func showLoading() {
+        canShowLoading = true
+    }
+
+    func hideLoading() {
+        canShowLoading = false
+    }
+}
+
+extension HeroListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        presenter?.onSearchForHero(searchBar.text ?? "")
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         presenter?.onFetchHeros()
     }
 }
 
 extension HeroListViewController: UITableViewDataSource, UITableViewDelegate {
-
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 1 {
-            return isFetchingData ? 1 : 0
+            return canShowLoading ? 1 : 0
         }
         return heros.count
     }
@@ -90,10 +117,7 @@ extension HeroListViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-
-        if (offsetY > contentHeight - scrollView.frame.height * 4) && !isFetchingData {
+        if (scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.frame.size.height)) && !canShowLoading && !reachedEnd {
             fetchMoreHeros()
         }
     }

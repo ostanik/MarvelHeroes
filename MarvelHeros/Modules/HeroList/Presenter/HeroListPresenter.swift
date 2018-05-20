@@ -16,6 +16,8 @@ class HeroListPresenter {
     var interactor: HeroListUseCase?
 
     private var heros = [Hero]()
+    private var searchName = ""
+    private var reachedEnd: Bool = true
 
     init(view: HeroListView = HeroListViewController(), router: HeroListWireframe = HeroListRouter(), interactor: HeroListUseCase = HeroListInteractor()) {
         self.view = view
@@ -26,19 +28,42 @@ class HeroListPresenter {
 
 extension HeroListPresenter: HeroListPresentation {
     func onFetchHeros() {
-        interactor?.fetchHerosList(offset: heros.count)
+        searchName = ""
+        heros = []
+        view?.showLoading()
+        view?.updateHerosList([], reachedEnd: true)
+        interactor?.fetchHerosList(name: searchName, offset: heros.count)
+    }
+
+    func onFetchHerosPagination() {
+        view?.showLoading()
+        if !reachedEnd {
+            interactor?.fetchHerosList(name: searchName, offset: heros.count)
+        } else {
+            view?.hideLoading()
+        }
     }
 
     func onSelectedHero(at index: IndexPath) {
         guard let char = heros[safe: index.row] else { return }
         router?.openDetailOf(char)
     }
+
+    func onSearchForHero(_ name: String) {
+        view?.updateHerosList([], reachedEnd: true)
+        view?.showLoading()
+        heros = []
+        searchName = name
+        interactor?.fetchHerosList(name: searchName, offset: 0)
+    }
 }
 
 extension HeroListPresenter: HeroListInteractorOutput {
-    func onSuccessFetchHeros(_ heros: [Hero]) {
-        self.heros.append(contentsOf: heros)
-        view?.updateHerosList(self.heros)
+    func onSuccessFetchHeros(_ dataContainer: DataContainer<Hero>) {
+        reachedEnd = dataContainer.count + dataContainer.offset == dataContainer.total
+        self.heros.append(contentsOf: dataContainer.results)
+        view?.updateHerosList(self.heros, reachedEnd: reachedEnd)
+        view?.hideLoading()
     }
 
     func onFailureFetchHeros(_ error: Error) {
@@ -47,5 +72,6 @@ extension HeroListPresenter: HeroListInteractorOutput {
         } else {
             view?.showError(message: error.localizedDescription)
         }
+        view?.hideLoading()
     }
 }

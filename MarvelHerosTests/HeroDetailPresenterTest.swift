@@ -43,7 +43,7 @@ class HeroDetailPresenterTest: XCTestCase {
     }
 
     func testWhaitForAllCallsToUpdateViewWithoutRequestError() {
-        guard let hero: Hero = self.loadObjectFromJSON(withFileNamed: "Character") else {
+        guard let hero: Hero = self.loadObjectFromJSON(withFileNamed: "3DMan") else {
             XCTFail("Unable to load mocked character")
             return
         }

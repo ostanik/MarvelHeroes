@@ -19,13 +19,13 @@ class HeroListInteractor: HeroListUseCase {
 
     // MARK: Protocol methods
 
-    func fetchHerosList(offset: Int) {
-        dataProvider.fetchHero(offset: offset, completionHandler: { [weak self] (response, error) in
+    func fetchHerosList(name: String, offset: Int) {
+        dataProvider.fetchHero(startName: name, offset: offset, completionHandler: { [weak self] (response, error) in
             guard error == nil, let response = response else {
                 self?.output?.onFailureFetchHeros(error!)
                 return
             }
-            self?.output?.onSuccessFetchHeros(response.results)
+            self?.output?.onSuccessFetchHeros(response)
         })
     }
 }

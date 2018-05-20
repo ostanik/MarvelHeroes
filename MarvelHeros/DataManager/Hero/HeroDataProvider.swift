@@ -9,8 +9,11 @@
 import Foundation
 
 class HeroDataProvider: BaseDataProvider, HerosProvider {
-    func fetchHero(offset: Int, completionHandler: @escaping HerosProvider.CompletionHandler) {
-        let stringUrl = baseAddress + "/characters?" + [authenticationParameters, "offset=\(offset)"].joined(separator: "&")
+    func fetchHero(startName: String, offset: Int, completionHandler: @escaping HerosProvider.CompletionHandler) {
+        var stringUrl = baseAddress + "/characters?" + [authenticationParameters, "offset=\(offset)"].joined(separator: "&")
+        if !startName.isEmpty {
+            stringUrl += "&nameStartsWith=\(startName)"
+        }
         request(stringUrl, method: .get) { ( container: DataContainer<Hero>?, error: Error?) in
             guard error == nil else {
                 completionHandler(nil, error!)
